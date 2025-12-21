@@ -4,13 +4,13 @@ Habit Island is a cross-platform, gamified habit tracker built with Flutter, des
 
 By completing daily habits, users grow a beautiful virtual island. When habits are missed, the island gently reflects that through weather and decay — encouraging recovery, not guilt.
 
-✨ Core Philosophy
+✨ Core Philosophy-
 Simple habit tracking paired with meaningful visual rewards
 Solo-focused experience — no leaderboards, no social pressure
 Visual consequences without punishment
 Calm, aesthetic-first design that encourages consistency
 
-🚀 Features (MVP)
+🚀 Features (MVP)-
 Habit Management
 Create, edit, and delete habits
 Four core habit types:
@@ -23,21 +23,21 @@ Optional reminders
 One-tap completion with animations
 Streak tracking and history calendar
 
-Island Growth System
+Island Growth System-
 Each habit appears as a physical object on the island
 Habit streaks visually upgrade objects (growth levels)
 Missed habits trigger gentle decay (clouds, storms, wilting)
 Recovery is always possible through continued completion
 
-Weather System
+Weather System-
 Island-wide weather reflects overall habit completion
 Conditions range from sunny and rainbow-filled to stormy
 
-Progression & Rewards
+Progression & Rewards-
 XP-based leveling system
 Daily login rewards
 Streak milestones (7-day, 30-day bonuses)
-💰 Monetization
+💰 Monetization-
 Free Tier
 Up to 7 active habits
 Full island growth system
@@ -51,7 +51,7 @@ Advanced insights & analytics
 Custom themes and icons
 Multiple islands
 
-🧠 Tech Stack
+🧠 Tech Stack-
 Frontend
 Flutter (iOS & Android)
 BLoC for state management
@@ -64,14 +64,14 @@ OneSignal for push notifications
 AdMob (rewarded ads only)
 RevenueCat for subscriptions
 
-🏗 Architecture Overview
+🏗 Architecture Overview-
 Local-first design: instant UI updates, background sync
 Offline support with conflict resolution
 Server as source of truth
 Streaks are always recalculated from completion history
 Clear separation between Flutter UI logic and Flame game rendering
 
-🎨 Design System
+🎨 Design System-
 Soft pastel color palette
 Accessible contrast (WCAG AA)
 Nunito & Inter typography
@@ -79,12 +79,12 @@ Motion-reduced mode supported
 Self-designed pixel and isometric assets
 Designs are created in Figma with a component-first approach and handed off directly to Flutter.
 
-🗺 Development Timeline
+🗺 Development Timeline-
 90-day MVP roadmap
 Parallel design and development
 Iterative delivery with early beta testing
 
-📱 Platform Support
+📱 Platform Support-
 iOS 15+
 Android (API 23+)
 🔐 Security & Privacy
@@ -93,14 +93,14 @@ User data protected via Row-Level Security
 Optional analytics
 No forced ads
 
-🧪 Status
+🧪 Status-
 🚧 Active Development (MVP)
 This project is currently under active development as an indie-built product.
 
-📄 License
+📄 License-
 This project is currently proprietary. Licensing details will be added before public release.
 
-🌱 Vision
+🌱 Vision-
 Habit Island aims to make habit-building feel calm, rewarding, and human — turning consistency into something you can see, not just count.
 Grow your habits. Grow your island.
 
