@@ -326,7 +326,7 @@ extension XpEventModelFactory on XpEventModel {
     DateTime? earnedAt,
   }) {
     final is7Day = streakDays == 7;
-    final is30Day = streakDays == 30;
+    //final is30Day = streakDays == 30;
 
     return XpEventModel(
       id: id,
