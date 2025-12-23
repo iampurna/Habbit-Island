@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:habbit_island/core/errors/exceptions.dart';
+
 import 'hive_database.dart';
 
 /// Sync Queue Local Data Source
@@ -345,27 +347,4 @@ enum SyncStatus {
   syncing, // Currently syncing
   synced, // Successfully synced
   failed, // Failed to sync
-}
-
-/// Custom exceptions
-class CacheException implements Exception {
-  final String message;
-  final String? code;
-
-  const CacheException(this.message, {this.code});
-
-  @override
-  String toString() =>
-      'CacheException: $message ${code != null ? '(Code: $code)' : ''}';
-}
-
-class NotFoundException implements Exception {
-  final String message;
-  final String? code;
-
-  const NotFoundException(this.message, {this.code});
-
-  @override
-  String toString() =>
-      'NotFoundException: $message ${code != null ? '(Code: $code)' : ''}';
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'package:habbit_island/core/errors/exceptions.dart';
 import 'package:habbit_island/data/models/habit_model.dart';
-import 'hive_database.dart';
+import 'hive_database.dart' hide CacheException;
 
 /// Habit Local Data Source
 /// Handles local storage of habits using Hive
@@ -323,36 +324,4 @@ class HabitLocalDataSource {
       throw CacheException('Failed to clear habits: $e');
     }
   }
-
-  /// Clear all data
-  Future<void> clearAll() async {
-    try {
-      await _hiveDb.habits.clear();
-    } catch (e) {
-      throw CacheException('Failed to clear all habits: $e');
-    }
-  }
-}
-
-/// Custom exceptions (reference your existing exception files)
-class CacheException implements Exception {
-  final String message;
-  final String? code;
-
-  const CacheException(this.message, {this.code});
-
-  @override
-  String toString() =>
-      'CacheException: $message ${code != null ? '(Code: $code)' : ''}';
-}
-
-class NotFoundException implements Exception {
-  final String message;
-  final String? code;
-
-  const NotFoundException(this.message, {this.code});
-
-  @override
-  String toString() =>
-      'NotFoundException: $message ${code != null ? '(Code: $code)' : ''}';
 }

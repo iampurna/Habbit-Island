@@ -1,3 +1,4 @@
+import 'package:habbit_island/core/errors/exceptions.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -217,16 +218,4 @@ class HiveDatabase {
     final size = await getDatabaseSize();
     return size > 10 * 1024 * 1024; // 10MB
   }
-}
-
-/// Custom exception for cache operations
-class CacheException implements Exception {
-  final String message;
-  final String? code;
-
-  const CacheException(this.message, {this.code});
-
-  @override
-  String toString() =>
-      'CacheException: $message ${code != null ? '(Code: $code)' : ''}';
 }

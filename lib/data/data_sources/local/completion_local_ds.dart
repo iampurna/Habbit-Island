@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:habbit_island/core/errors/exceptions.dart';
 import 'package:habbit_island/data/models/habit_completion_model.dart';
 import 'package:habbit_island/data/models/habit_streak_model.dart';
 import 'package:habbit_island/data/models/island_state_model.dart';
@@ -164,11 +165,4 @@ class CompletionsLocalDataSource {
       throw CacheException('Failed to clear all: $e');
     }
   }
-}
-
-class CacheException implements Exception {
-  final String message;
-  const CacheException(this.message);
-  @override
-  String toString() => 'CacheException: $message';
 }
