@@ -50,7 +50,15 @@ enum HabitCategory {
   water, // Well → Fountain → Waterfall
   exercise, // Path → Fitness Corner → Mountain Trail
   reading, // Books → Reading Nook → Library
-  meditation, // Flower → Lotus Pond → Zen Garden
+  meditation,
+  mindfulness,
+  social,
+  creative,
+  custom,
+  learning,
+  productivity,
+  sleep,
+  nutrition, // Flower → Lotus Pond → Zen Garden
 }
 
 // ============================================================================
