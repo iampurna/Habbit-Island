@@ -119,7 +119,7 @@ class PremiumRepository {
     }
   }
 
-  Future<Either<Failure, int>> getVacationDaysRemaining() async {
+  Future<Either<Failure, int>> getVacationDaysRemaining(String userId) async {
     try {
       final premium = await _localDS.getCurrentPremium();
       return Right(premium?.vacationDaysRemaining ?? 0);
