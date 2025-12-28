@@ -6,7 +6,6 @@ import '../../blocs/habit/habit_state.dart';
 import '../../blocs/xp/xp_bloc.dart';
 import '../../blocs/xp/xp_event.dart';
 import '../../blocs/xp/xp_state.dart';
-import '../../widgets/habit/habit_card.dart';
 import '../../widgets/xp/xp_progress_bar.dart';
 import '../../widgets/animations/habit_completion_animation.dart';
 import '../../widgets/animations/xp_award_animation.dart';

@@ -139,6 +139,8 @@ class XpEventModel extends Equatable {
 
   /// Get formatted XP amount
   String get formattedXp => '+$xpAmount XP';
+
+  static dailyLogin({required String id, required String userId}) {}
 }
 
 // ============================================================================

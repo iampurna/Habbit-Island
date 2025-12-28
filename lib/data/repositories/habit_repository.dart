@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:habbit_island/data/services/storage_service.dart';
+import 'package:habbit_island/domain/entities/habit.dart';
 import '../data_sources/local/habit_local_ds.dart';
 import '../data_sources/remote/habit_remote_ds.dart';
 import '../data_sources/local/sync_queue_local_ds.dart';
-import '../models/habit_model.dart';
+import '../models/habit_model.dart' hide HabitCategory, HabitFrequency;
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 
@@ -19,6 +21,7 @@ class HabitRepository {
     required HabitLocalDataSource localDS,
     required HabitRemoteDataSource remoteDS,
     required SyncQueueLocalDataSource syncQueueDS,
+    required StorageService storageService,
   }) : _localDS = localDS,
        _remoteDS = remoteDS,
        _syncQueueDS = syncQueueDS;
@@ -28,7 +31,17 @@ class HabitRepository {
   // ============================================================================
 
   /// Create new habit (offline-first)
-  Future<Either<Failure, HabitModel>> createHabit(HabitModel habit) async {
+  Future<Either<Failure, HabitModel>> createHabit(
+    HabitModel habit, {
+    required String userId,
+    required String name,
+    String? description,
+    required HabitCategory category,
+    required HabitFrequency frequency,
+    String? customFrequencyDays,
+    required String zoneId,
+    String? reminderTime,
+  }) async {
     try {
       // 1. Validate business rules
       final validationResult = await _validateHabitCreation(habit);

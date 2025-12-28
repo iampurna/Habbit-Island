@@ -1,5 +1,7 @@
 import 'package:dartz/dartz.dart';
-import '../../entities/habit.dart';
+import 'package:habbit_island/data/models/habit_model.dart' hide HabitCategory;
+import 'package:habbit_island/domain/use_cases/habits/complete_habit.dart';
+import '../../entities/habit.dart' hide HabitFrequency;
 import '../../../data/repositories/habit_repository.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/utils/app_logger.dart';
@@ -50,7 +52,7 @@ class UpdateHabit {
         updatedAt: DateTime.now(),
       );
 
-      final result = await repository.updateHabit(updatedHabit);
+      final result = await repository.updateHabit(updatedHabit as HabitModel);
 
       return result.fold(
         (failure) {
@@ -59,7 +61,7 @@ class UpdateHabit {
         },
         (habit) {
           AppLogger.info('UpdateHabit: Success - Habit $habitId updated');
-          return Right(habit);
+          return Right(habit as Habit);
         },
       );
     } catch (e, stackTrace) {

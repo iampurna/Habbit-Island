@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:habbit_island/data/services/storage_service.dart';
 import '../data_sources/local/user_local_ds.dart';
 import '../data_sources/remote/user_remote_ds.dart';
 import '../models/user_model.dart';
@@ -15,6 +16,7 @@ class UserRepository {
   UserRepository({
     required UserLocalDataSource localDS,
     required UserRemoteDataSource remoteDS,
+    required StorageService storageService,
   }) : _localDS = localDS,
        _remoteDS = remoteDS;
 

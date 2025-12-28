@@ -1,26 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 /// Habit Entity
-/// Domain layer representation of a habit
-/// Contains business logic and validation rules
-
-enum HabitCategory {
-  water,
-  exercise,
-  mindfulness,
-  nutrition,
-  sleep,
-  productivity,
-  learning,
-  social,
-  creative,
-  custom,
-}
-
-enum HabitFrequency { daily, weekly, custom }
-
-enum GrowthStage { seed, sprout, sapling, tree, forest }
-
+/// Core domain model for habits with business logic
 class Habit extends Equatable {
   final String id;
   final String userId;
@@ -38,7 +19,8 @@ class Habit extends Equatable {
   final DateTime? lastCompletedAt;
   final GrowthStage growthStage;
   final int growthLevel;
-  final int decayCounter;
+  final double growthProgress;
+  final DecayState decayState;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -52,14 +34,15 @@ class Habit extends Equatable {
     this.customFrequencyDays,
     required this.zoneId,
     this.reminderTime,
-    required this.isActive,
-    required this.currentStreak,
-    required this.longestStreak,
-    required this.totalCompletions,
+    this.isActive = true,
+    this.currentStreak = 0,
+    this.longestStreak = 0,
+    this.totalCompletions = 0,
     this.lastCompletedAt,
-    required this.growthStage,
-    required this.growthLevel,
-    required this.decayCounter,
+    this.growthStage = GrowthStage.seed,
+    this.growthLevel = 1,
+    this.growthProgress = 0.0,
+    this.decayState = DecayState.healthy,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -82,16 +65,17 @@ class Habit extends Equatable {
     lastCompletedAt,
     growthStage,
     growthLevel,
-    decayCounter,
+    growthProgress,
+    decayState,
     createdAt,
     updatedAt,
   ];
 
   // ============================================================================
-  // BUSINESS LOGIC
+  // BUSINESS LOGIC METHODS
   // ============================================================================
 
-  /// Check if habit is completed today
+  /// Check if habit was completed today
   bool get isCompletedToday {
     if (lastCompletedAt == null) return false;
 
@@ -103,48 +87,53 @@ class Habit extends Equatable {
         now.day == lastCompleted.day;
   }
 
-  /// Check if habit is overdue (should have been completed but wasn't)
+  /// Check if habit is overdue (based on frequency)
   bool get isOverdue {
-    if (lastCompletedAt == null)
+    if (lastCompletedAt == null && frequency == HabitFrequency.daily) {
+      // Never completed daily habit
       return createdAt.isBefore(
         DateTime.now().subtract(const Duration(days: 1)),
       );
+    }
 
-    final daysSinceLastCompletion = DateTime.now()
-        .difference(lastCompletedAt!)
-        .inDays;
+    if (lastCompletedAt == null) return false;
+
+    final now = DateTime.now();
+    final daysSinceCompletion = now.difference(lastCompletedAt!).inDays;
 
     switch (frequency) {
       case HabitFrequency.daily:
-        return daysSinceLastCompletion > 1;
+        return daysSinceCompletion >= 1;
       case HabitFrequency.weekly:
-        return daysSinceLastCompletion > 7;
+        return daysSinceCompletion >= 7;
       case HabitFrequency.custom:
-        // For custom frequency, consider overdue if more than the longest interval
-        return daysSinceLastCompletion > 7;
+        // Custom frequency implementation
+        return false;
     }
   }
 
-  /// Check if habit is at risk of breaking streak (missed yesterday)
+  /// Check if habit is at risk of losing streak
   bool get isAtRisk {
-    if (lastCompletedAt == null) return false;
-
-    final daysSinceLastCompletion = DateTime.now()
-        .difference(lastCompletedAt!)
-        .inDays;
-    return daysSinceLastCompletion == 1;
+    return isOverdue || decayState != DecayState.healthy;
   }
 
-  /// Calculate growth progress (0.0 - 1.0)
-  double get growthProgress {
-    // Each stage requires 10 completions
-    const completionsPerStage = 10;
-    final currentStageCompletions = growthLevel % completionsPerStage;
-    return currentStageCompletions / completionsPerStage;
+  /// Check if habit can grow to next stage
+  bool get canGrow {
+    return currentStreak >= _getGrowthRequirement() &&
+        growthStage != GrowthStage.forest;
+  }
+
+  /// Get days until habit can grow
+  int get daysUntilGrowth {
+    if (!canGrow) {
+      final requirement = _getGrowthRequirement();
+      return requirement - currentStreak;
+    }
+    return 0;
   }
 
   /// Get next growth stage
-  GrowthStage get nextGrowthStage {
+  GrowthStage? get nextGrowthStage {
     switch (growthStage) {
       case GrowthStage.seed:
         return GrowthStage.sprout;
@@ -155,77 +144,63 @@ class Habit extends Equatable {
       case GrowthStage.tree:
         return GrowthStage.forest;
       case GrowthStage.forest:
-        return GrowthStage.forest; // Max stage
+        return null; // Max stage
     }
   }
 
-  /// Check if ready to grow to next stage
-  bool get canGrow {
-    if (growthStage == GrowthStage.forest) return false;
-    return growthLevel >= _getRequiredLevelForNextStage();
-  }
-
-  int _getRequiredLevelForNextStage() {
+  /// Get streak requirement for current growth stage
+  int _getGrowthRequirement() {
     switch (growthStage) {
       case GrowthStage.seed:
-        return 10; // 10 completions to sprout
+        return 7; // 7 days to sprout
       case GrowthStage.sprout:
-        return 20; // 20 total to sapling
+        return 14; // 14 days to sapling
       case GrowthStage.sapling:
-        return 40; // 40 total to tree
+        return 30; // 30 days to tree
       case GrowthStage.tree:
-        return 80; // 80 total to forest
+        return 60; // 60 days to forest
       case GrowthStage.forest:
-        return 999; // Already at max
+        return 999; // Max stage
     }
   }
 
-  /// Check if habit needs decay evaluation
-  bool get needsDecayCheck {
-    if (lastCompletedAt == null) return false;
-    final daysSinceCompletion = DateTime.now()
-        .difference(lastCompletedAt!)
-        .inDays;
-    return daysSinceCompletion >= 2; // Check decay after 2+ days
+  /// Calculate growth progress percentage
+  double calculateGrowthProgress() {
+    if (growthStage == GrowthStage.forest) return 1.0;
+
+    final requirement = _getGrowthRequirement();
+    return (currentStreak / requirement).clamp(0.0, 1.0);
   }
 
-  /// Calculate decay severity (0-3)
-  int get decaySeverity {
-    if (lastCompletedAt == null) return 0;
-
-    final daysSinceCompletion = DateTime.now()
-        .difference(lastCompletedAt!)
-        .inDays;
-
-    if (daysSinceCompletion < 2) return 0; // No decay
-    if (daysSinceCompletion < 4) return 1; // Minor decay
-    if (daysSinceCompletion < 7) return 2; // Moderate decay
-    return 3; // Severe decay
+  /// Get habit category color
+  String getCategoryColorHex() {
+    switch (category) {
+      case HabitCategory.water:
+        return '#2196F3';
+      case HabitCategory.exercise:
+        return '#F44336';
+      case HabitCategory.mindfulness:
+        return '#9C27B0';
+      case HabitCategory.nutrition:
+        return '#4CAF50';
+      case HabitCategory.sleep:
+        return '#3F51B5';
+      case HabitCategory.productivity:
+        return '#FF9800';
+      case HabitCategory.learning:
+        return '#009688';
+      case HabitCategory.social:
+        return '#E91E63';
+      case HabitCategory.creative:
+        return '#FFC107';
+      case HabitCategory.reading:
+        return '#795548';
+      case HabitCategory.meditation:
+        return '#673AB7';
+      case HabitCategory.custom:
+        return '#607D8B';
+    }
   }
-
-  // ============================================================================
-  // VALIDATION
-  // ============================================================================
-
-  /// Validate habit name
-  static bool isValidName(String name) {
-    return name.trim().isNotEmpty && name.length <= 50;
-  }
-
-  /// Validate habit data
-  bool isValid() {
-    return isValidName(name) &&
-        zoneId.isNotEmpty &&
-        currentStreak >= 0 &&
-        longestStreak >= 0 &&
-        totalCompletions >= 0 &&
-        growthLevel >= 0 &&
-        decayCounter >= 0;
-  }
-
-  // ============================================================================
-  // COPY WITH
-  // ============================================================================
 
   Habit copyWith({
     String? id,
@@ -244,7 +219,8 @@ class Habit extends Equatable {
     DateTime? lastCompletedAt,
     GrowthStage? growthStage,
     int? growthLevel,
-    int? decayCounter,
+    double? growthProgress,
+    DecayState? decayState,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -265,9 +241,35 @@ class Habit extends Equatable {
       lastCompletedAt: lastCompletedAt ?? this.lastCompletedAt,
       growthStage: growthStage ?? this.growthStage,
       growthLevel: growthLevel ?? this.growthLevel,
-      decayCounter: decayCounter ?? this.decayCounter,
+      growthProgress: growthProgress ?? this.growthProgress,
+      decayState: decayState ?? this.decayState,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum HabitCategory {
+  water,
+  exercise,
+  mindfulness,
+  nutrition,
+  sleep,
+  productivity,
+  learning,
+  social,
+  creative,
+  reading,
+  meditation,
+  custom,
+}
+
+enum HabitFrequency { daily, weekly, custom }
+
+enum GrowthStage { seed, sprout, sapling, tree, forest }
+
+enum DecayState { healthy, warning, cloudy, stormy }

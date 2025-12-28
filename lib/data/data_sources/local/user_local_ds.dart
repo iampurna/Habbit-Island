@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:habbit_island/core/errors/exceptions.dart';
-import 'package:habbit_island/data/models/premium_entitlement_model.dart';
+import 'package:habbit_island/data/models/premium_entitlement_model.dart'
+    hide PremiumTier;
 import 'package:habbit_island/data/models/user_model.dart';
 
 import 'hive_database.dart';

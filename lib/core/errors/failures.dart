@@ -311,7 +311,8 @@ class StreakShieldUnavailableFailure extends Failure {
   final int shieldsRemaining;
   final bool isPremium;
 
-  const StreakShieldUnavailableFailure({
+  const StreakShieldUnavailableFailure(
+    String s, {
     required this.shieldsRemaining,
     required this.isPremium,
   }) : super(
@@ -385,7 +386,8 @@ class XpAlreadyClaimedFailure extends Failure {
   final String rewardType;
   final DateTime claimedAt;
 
-  const XpAlreadyClaimedFailure({
+  const XpAlreadyClaimedFailure(
+    String s, {
     required this.rewardType,
     required this.claimedAt,
   }) : super('XP already claimed for $rewardType', code: 'XP_ALREADY_CLAIMED');

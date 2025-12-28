@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:habbit_island/domain/use_cases/habits/complete_habit.dart';
 import '../../entities/habit.dart';
 import '../../../data/repositories/habit_repository.dart';
 import '../../../core/errors/failures.dart';
@@ -53,7 +54,7 @@ class CreateHabit {
         },
         (habit) {
           AppLogger.info('CreateHabit: Success - Habit ${habit.id} created');
-          return Right(habit);
+          return Right(habit as Habit);
         },
       );
     } catch (e, stackTrace) {

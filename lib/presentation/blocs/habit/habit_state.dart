@@ -60,8 +60,6 @@ Completed extends HabitState {
 
   @override
   List<Object> get props => [habit, xpEarned, hadBonus, newStreak];
-
-  bool get isCompletedToday => null;
 }
 
 class HabitCreated extends HabitState {

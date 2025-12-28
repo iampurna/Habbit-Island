@@ -40,14 +40,14 @@ class _LevelUpAnimationState extends State<LevelUpAnimation>
         tween: Tween(
           begin: 0.0,
           end: 1.3,
-        ).chain(CurvedTween(curve: Curves.easeOut)),
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
         tween: Tween(
           begin: 1.3,
           end: 1.0,
-        ).chain(CurvedTween(curve: Curves.elasticOut)),
+        ).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 50,
       ),
     ]).animate(_controller);

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:habbit_island/core/errors/exceptions.dart';
 import 'package:habbit_island/data/models/habit_model.dart';
-import 'hive_database.dart' hide CacheException;
+import 'hive_database.dart';
 
 /// Habit Local Data Source
 /// Handles local storage of habits using Hive

@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:habbit_island/data/services/iap_service.dart';
+import '../../../data/services/iap_service.dart';
 import 'premium_event.dart';
 import 'premium_state.dart';
 import '../../../data/repositories/premium_repository.dart';
@@ -11,9 +11,10 @@ class PremiumBloc extends Bloc<PremiumEvent, PremiumState> {
 
   PremiumBloc({
     required IAPService iapService,
+    required PremiumRepository premiumRepository,
     required PremiumRepository repository,
   }) : _iapService = iapService,
-       _repository = repository,
+       _repository = premiumRepository,
        super(PremiumInitial()) {
     on<PremiumStatusChecked>(_onPremiumStatusChecked);
     on<PremiumPurchaseRequested>(_onPremiumPurchaseRequested);

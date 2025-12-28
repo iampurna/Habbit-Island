@@ -103,6 +103,12 @@ class IslandStateModel extends Equatable {
     int? totalXp,
     DateTime? lastUpdatedAt,
     DateTime? createdAt,
+    required DateTime updatedAt,
+    required WeatherCondition weatherCondition,
+    required double completionPercentage,
+    required List<String> unlockedZones,
+    required List<String> achievements,
+    required int currentLevel,
   }) {
     return IslandStateModel(
       id: id ?? this.id,

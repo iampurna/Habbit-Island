@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:habbit_island/domain/use_cases/habits/complete_habit.dart';
 import '../../../data/repositories/habit_repository.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/utils/app_logger.dart';

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:habbit_island/data/models/habit_model.dart';
 import 'package:habbit_island/data/repositories/complete_repository.dart';
 import '../../entities/habit.dart';
 import '../../../data/repositories/habit_repository.dart';
@@ -14,7 +15,8 @@ class CompleteHabit {
   final CompletionRepository completionRepository;
   final XpRepository xpRepository;
 
-  CompleteHabit({
+  CompleteHabit(
+    HabitRepository habit, {
     required this.habitRepository,
     required this.completionRepository,
     required this.xpRepository,
@@ -44,8 +46,8 @@ class CompleteHabit {
 
       // 3. Create completion record
       final completionResult = await completionRepository.createCompletion(
-        habitId: habitId,
         userId: userId,
+        habitId: habitId,
         completedAt: DateTime.now(),
         notes: notes,
       );
@@ -58,6 +60,7 @@ class CompleteHabit {
       final xpResult = await xpRepository.awardHabitCompletionXp(
         userId: userId,
         habitId: habitId,
+        completedAt: DateTime.now(),
       );
 
       int totalXpEarned = 0;
@@ -80,7 +83,7 @@ class CompleteHabit {
         updatedAt: DateTime.now(),
       );
 
-      await habitRepository.updateHabit(updatedHabit);
+      await habitRepository.updateHabit(updatedHabit as HabitModel);
 
       AppLogger.info('CompleteHabit: Success - Earned $totalXpEarned XP');
 
@@ -97,6 +100,13 @@ class CompleteHabit {
       return Left(UnexpectedFailure(e.toString()));
     }
   }
+}
+
+class UnexpectedFailure extends Failure {
+  final String details;
+
+  const UnexpectedFailure(this.details)
+    : super('An unexpected error occurred: $details');
 }
 
 /// Result of completing a habit

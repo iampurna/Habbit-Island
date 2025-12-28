@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:habbit_island/data/data_sources/local/completion_local_ds.dart';
 import 'package:habbit_island/data/data_sources/remote/completion_remote_ds.dart';
+import 'package:habbit_island/data/services/storage_service.dart';
 import '../data_sources/local/user_local_ds.dart';
 import '../data_sources/local/habit_local_ds.dart';
 import '../data_sources/remote/user_remote_ds.dart';
@@ -37,6 +38,7 @@ class XpRepository {
     required UserLocalDataSource userLocalDS,
     required UserRemoteDataSource userRemoteDS,
     required HabitLocalDataSource habitLocalDS,
+    required StorageService storageService,
   }) : _completionsLocalDS = completionsLocalDS,
        _completionsRemoteDS = completionsRemoteDS,
        _userLocalDS = userLocalDS,

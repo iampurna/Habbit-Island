@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:habbit_island/data/services/auth_service.dart';
+import '../../../data/services/auth_service.dart';
+import '../../../data/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 import '../../../core/utils/app_logger.dart';
@@ -7,10 +8,14 @@ import '../../../core/utils/app_logger.dart';
 /// Auth BLoC - Manages authentication state
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService _authService;
+  final AuthRepository _authRepository;
 
-  AuthBloc({required AuthService authService})
-    : _authService = authService,
-      super(AuthInitial()) {
+  AuthBloc({
+    required AuthService authService,
+    required AuthRepository authRepository,
+  }) : _authService = authService,
+       _authRepository = authRepository,
+       super(AuthInitial()) {
     on<SignUpRequested>(_onSignUpRequested);
     on<SignInRequested>(_onSignInRequested);
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
@@ -30,16 +35,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(const AuthLoading(message: 'Creating account...'));
 
-      final user = await _authService.signUpWithEmail(
+      final result = await _authRepository.signUpWithEmail(
         email: event.email,
         password: event.password,
         displayName: event.displayName,
       );
 
-      AppLogger.info('AuthBloc: Sign up successful');
-      emit(Authenticated(user));
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Sign up failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (user) {
+          AppLogger.info('AuthBloc: Sign up successful');
+          emit(Authenticated(user));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Sign up failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Sign up error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -51,15 +64,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(const AuthLoading(message: 'Signing in...'));
 
-      final user = await _authService.signInWithEmail(
+      final result = await _authRepository.signInWithEmail(
         email: event.email,
         password: event.password,
       );
 
-      AppLogger.info('AuthBloc: Sign in successful');
-      emit(Authenticated(user));
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Sign in failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (user) {
+          AppLogger.info('AuthBloc: Sign in successful');
+          emit(Authenticated(user));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Sign in failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Sign in error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -70,11 +91,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(const AuthLoading(message: 'Signing in with Google...'));
-      await _authService.signInWithGoogle();
-      // Auth state will be updated via stream
-      AppLogger.info('AuthBloc: Google sign in initiated');
+
+      final result = await _authRepository.signInWithGoogle();
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Google sign in failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (user) {
+          AppLogger.info('AuthBloc: Google sign in successful');
+          emit(Authenticated(user));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Google sign in failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Google sign in error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -85,11 +116,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(const AuthLoading(message: 'Signing in with Apple...'));
-      await _authService.signInWithApple();
-      // Auth state will be updated via stream
-      AppLogger.info('AuthBloc: Apple sign in initiated');
+
+      final result = await _authRepository.signInWithApple();
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Apple sign in failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (user) {
+          AppLogger.info('AuthBloc: Apple sign in successful');
+          emit(Authenticated(user));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Apple sign in failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Apple sign in error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -100,11 +141,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(const AuthLoading(message: 'Signing out...'));
-      await _authService.signOut();
-      AppLogger.info('AuthBloc: Sign out successful');
-      emit(Unauthenticated());
+
+      final result = await _authRepository.signOut();
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Sign out failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (_) {
+          AppLogger.info('AuthBloc: Sign out successful');
+          emit(Unauthenticated());
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Sign out failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Sign out error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -115,11 +166,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(const AuthLoading(message: 'Sending reset email...'));
-      await _authService.sendPasswordResetEmail(event.email);
-      AppLogger.info('AuthBloc: Password reset email sent');
-      emit(const AuthSuccess('Password reset email sent'));
+
+      final result = await _authRepository.sendPasswordResetEmail(event.email);
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Password reset failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (_) {
+          AppLogger.info('AuthBloc: Password reset email sent');
+          emit(const AuthSuccess('Password reset email sent'));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Password reset failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Password reset error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -130,11 +191,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(const AuthLoading(message: 'Updating password...'));
-      await _authService.updatePassword(event.newPassword);
-      AppLogger.info('AuthBloc: Password updated');
-      emit(const AuthSuccess('Password updated successfully'));
+
+      final result = await _authRepository.updatePassword(event.newPassword);
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Password update failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (_) {
+          AppLogger.info('AuthBloc: Password updated');
+          emit(const AuthSuccess('Password updated successfully'));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Password update failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Password update error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -145,14 +216,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(const AuthLoading(message: 'Updating profile...'));
-      await _authService.updateProfile(
+
+      final result = await _authRepository.updateProfile(
         displayName: event.displayName,
         photoUrl: event.photoUrl,
       );
-      AppLogger.info('AuthBloc: Profile updated');
-      emit(const AuthSuccess('Profile updated successfully'));
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Profile update failed', failure);
+          emit(AuthError(failure.message));
+        },
+        (user) {
+          AppLogger.info('AuthBloc: Profile updated');
+          emit(const AuthSuccess('Profile updated successfully'));
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Profile update failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Profile update error', e, stackTrace);
       emit(AuthError(e.toString()));
     }
   }
@@ -161,13 +242,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthStateChecked event,
     Emitter<AuthState> emit,
   ) async {
-    final isAuth = _authService.isAuthenticated;
-    if (isAuth) {
-      emit(const AuthLoading(message: 'Checking auth...'));
-      // Fetch current user
-      AppLogger.debug('AuthBloc: User is authenticated');
-    } else {
-      AppLogger.debug('AuthBloc: User is not authenticated');
+    try {
+      final result = await _authRepository.getCurrentUser();
+
+      result.fold(
+        (failure) {
+          AppLogger.debug('AuthBloc: User is not authenticated');
+          emit(Unauthenticated());
+        },
+        (user) {
+          AppLogger.debug('AuthBloc: User is authenticated');
+          emit(Authenticated(user));
+        },
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error('AuthBloc: Auth state check error', e, stackTrace);
       emit(Unauthenticated());
     }
   }
@@ -177,10 +266,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      await _authService.refreshSession();
-      AppLogger.debug('AuthBloc: Session refreshed');
+      final result = await _authRepository.refreshSession();
+
+      result.fold(
+        (failure) {
+          AppLogger.error('AuthBloc: Session refresh failed', failure);
+          emit(Unauthenticated());
+        },
+        (_) {
+          AppLogger.debug('AuthBloc: Session refreshed');
+        },
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('AuthBloc: Session refresh failed', e, stackTrace);
+      AppLogger.error('AuthBloc: Session refresh error', e, stackTrace);
       emit(Unauthenticated());
     }
   }

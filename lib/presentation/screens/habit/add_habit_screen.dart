@@ -25,7 +25,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
 
   HabitCategory _selectedCategory = HabitCategory.custom;
   HabitFrequency _selectedFrequency = HabitFrequency.daily;
-  String _selectedZone = 'starter-beach';
+  final String _selectedZone = 'starter-beach';
   String? _reminderTime;
 
   @override

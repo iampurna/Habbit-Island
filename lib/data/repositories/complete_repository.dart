@@ -26,8 +26,12 @@ class CompletionRepository {
 
   // COMPLETIONS
   Future<Either<Failure, HabitCompletionModel>> createCompletion(
-    HabitCompletionModel completion,
-  ) async {
+    HabitCompletionModel completion, {
+    required String habitId,
+    required String userId,
+    required DateTime completedAt,
+    String? notes,
+  }) async {
     try {
       await _localDS.saveCompletion(completion);
 

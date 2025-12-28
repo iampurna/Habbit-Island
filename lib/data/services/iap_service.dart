@@ -387,6 +387,8 @@ class IAPService {
   void listenToCustomerInfo(Function(CustomerInfo) callback) {
     Purchases.addCustomerInfoUpdateListener(callback);
   }
+
+  Future<void> init() async {}
 }
 
 /// Subscription status

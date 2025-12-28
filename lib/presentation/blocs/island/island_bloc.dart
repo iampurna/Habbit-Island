@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'island_event.dart';
 import 'island_state.dart';
+import '../../../data/repositories/island_repository.dart';
 import '../../../core/utils/app_logger.dart';
 
 class IslandBloc extends Bloc<IslandEvent, IslandState> {
@@ -13,6 +14,7 @@ class IslandBloc extends Bloc<IslandEvent, IslandState> {
     on<IslandUpdateRequested>(_onIslandUpdateRequested);
     on<ZoneUnlockRequested>(_onZoneUnlockRequested);
     on<AchievementUnlockRequested>(_onAchievementUnlockRequested);
+    on<WeatherUpdateRequested>(_onWeatherUpdateRequested);
   }
 
   Future<void> _onIslandLoadRequested(
@@ -102,6 +104,32 @@ class IslandBloc extends Bloc<IslandEvent, IslandState> {
       });
     } catch (e, stackTrace) {
       AppLogger.error('IslandBloc: Unlock achievement error', e, stackTrace);
+      emit(IslandError(e.toString()));
+    }
+  }
+
+  Future<void> _onWeatherUpdateRequested(
+    WeatherUpdateRequested event,
+    Emitter<IslandState> emit,
+  ) async {
+    try {
+      final result = await _repository.updateWeather(
+        userId: event.userId,
+        completionPercentage: event.completionPercentage,
+      );
+
+      result.fold(
+        (failure) {
+          AppLogger.error('IslandBloc: Weather update failed', failure);
+          emit(IslandError(failure.message));
+        },
+        (island) {
+          AppLogger.debug('IslandBloc: Weather updated');
+          emit(IslandLoaded(island));
+        },
+      );
+    } catch (e, stackTrace) {
+      AppLogger.error('IslandBloc: Weather update error', e, stackTrace);
       emit(IslandError(e.toString()));
     }
   }

@@ -122,9 +122,10 @@ class RotationRoute extends PageRouteBuilder {
 
 /// Custom transition helper
 class PageTransitions {
-  static Route<T> slideRight<T>(Widget page) => SlideRightRoute(page: page);
-  static Route<T> fade<T>(Widget page) => FadeRoute(page: page);
-  static Route<T> scale<T>(Widget page) => ScaleRoute(page: page);
-  static Route<T> slideUp<T>(Widget page) => SlideUpRoute(page: page);
-  static Route<T> rotation<T>(Widget page) => RotationRoute(page: page);
+  static SlideRightRoute slideRight<T>(Widget page) =>
+      SlideRightRoute(page: page);
+  static FadeRoute fade<T>(Widget page) => FadeRoute(page: page);
+  static ScaleRoute scale<T>(Widget page) => ScaleRoute(page: page);
+  static SlideUpRoute slideUp<T>(Widget page) => SlideUpRoute(page: page);
+  static RotationRoute rotation<T>(Widget page) => RotationRoute(page: page);
 }

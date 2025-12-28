@@ -1,4 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:habbit_island/data/repositories/habit_repository.dart';
+import 'package:habbit_island/data/repositories/island_repository.dart';
+import 'package:habbit_island/data/repositories/user_repository.dart';
+import 'package:habbit_island/domain/use_cases/habits/complete_habit.dart';
 import '../../../data/repositories/sync_repository.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/utils/app_logger.dart';
@@ -9,7 +13,12 @@ import '../../../core/utils/app_logger.dart';
 class SyncData {
   final SyncRepository repository;
 
-  SyncData(this.repository);
+  SyncData(
+    this.repository, {
+    required HabitRepository habitRepository,
+    required UserRepository userRepository,
+    required IslandRepository islandRepository,
+  });
 
   Future<Either<Failure, SyncResult>> execute({
     required String userId,
